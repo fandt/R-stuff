@@ -1,3 +1,5 @@
+#just plotting of labeled points with curved lines between matches
+
 X<-c(-40,-15,40,-5,2,1,3,3.5,4.25,2,24.5,	26.5,38,-4,-4,-8)
 Y<-c(10.75,8.8,9.2,8.9,-3,6,5.5,3,3.5,8.25,6.5,5.5,10.25,4,2.4,1.3)
 Z<-c("Mission Support
