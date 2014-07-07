@@ -1,3 +1,5 @@
+#plots data from downloaded text files, transformed by the Python Script 
+
 library(ggplot2)
 library(reshape)
 bardata<-read.table("C:/path/counts.txt",header=TRUE,sep="\t",row.names=NULL)
