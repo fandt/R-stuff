@@ -1,0 +1,19 @@
+linklist<-read.csv("C:/Users/Documents/Opera/OperaList.txt",quote="",header=FALSE)
+DF<-data.frame()
+for (i in 1:dim(linklist)[1]){
+operalink <- gsub("[[:space:]]+$","",(gsub(" ","+",(gsub("*\\(.*?\\) *","",linklist[i,1])))))
+searchphrase <- paste("wiki",operalink[1],"opera",sep="+")
+opera<-GET(paste("http://www.bing.com/search?q=", searchphrase,sep=""))
+http_status(opera)
+page<-content(opera,"text")
+links<-xpathSApply(htmlParse(opera),"//a/@href")
+for (link in 1:(length(links))){
+  if (grepl("http://en.wikipedia.org/wiki/",links[link])){
+   DF[i,1]<- as.character(linklist[i,1])
+   DF[i,2]<-as.character(gsub("[[:space:]]+$","",(gsub("*\\(.*?\\) *","",linklist[i,1]))))
+   DF[i,3] <- as.character(links[link])
+   break
+  }
+}
+}
+write.matrix(DF,"C:/Users/Documents/opera.xls", sep="\t")
