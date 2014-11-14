@@ -1,0 +1,177 @@
+library(quantmod)
+library(MASS)
+Symbolfile<-read.table("C:/Users/rmorganstern/Documents/companies, listed/Symbols.txt",header=FALSE,sep="\t",row.names=NULL)
+
+
+DF<-data.frame(Symbol=c("Year","Total Assets","Total Debt","Total Liabilities",
+    "Total Equity","Total Revenue","Income After Tax",
+    "Net Income","Income Before Tax","Trailing Net Revenue (prev yr)",
+    "Trailing Income before Taxes (prev yr)","Trailing Net Income (prev yr)",
+    "Statutory Surplus = Assets-Liability","Net Income Margin = Net Income*100/Revenue",
+    "Net Income Margin from Prior yr",
+    "1 Yr Revenue Growth Rate = (Revenue/Previous Yr Revenue)-1","EBT Margin = EBT/Revenue",
+    "EBT Margin from Prior yr","Total Liabilities & Shareholder's Equity",
+    "Return on Equity=Net Income/Shareholder's Equity","Total Equity (3 prev yr)",
+    "Total Equity (2 prev yr)","Total Equity (prev yr)","Historic Return on Equity- 3 yr avg", 
+    "Income (2 prev yr)","2 Yr Earnings CAGR","Revenue (2 prev yr)",
+    "Total Common Shares Outstanding","MVE=Market shares outstanding*current stock value",
+    "Income (3 prev yr)","Total Liabilities & Shareholder's Equity (prev yr)",
+    "Total Liabilities & Shareholder's Equity (2 prev yr)","Total Liabilities & Shareholder's Equity (3 prev yr)", 
+    "2 Yr Avg EBT Margin","2 Yr Avg Net Income Margin","2 Yr Avg Return on Equity","Net Income Margin (2 prev yr)",
+    "Net Income Margin (3 prev yr)", "Revenue (3 prev yr)","Intangibles (or Goodwill)",
+    "Tangible Book Value of Equity = Equity - Intangibles",
+    "ROTE = Net Income/(Common Shareholder Equity – Intangibles)","Intangibles (or Goodwill) (prev yr)",
+    "ROTE- 3 yr avg","Intangibles (or Goodwill) (2 prev yr)","Growth of Equity- 3 yr historical (2010 to 2013)"  ))
+
+sf <-Symbolfile[1]
+colors<-rainbow(dim(sf)[1])
+for (s in 1:dim(sf)[1]){
+#s is the current symbol number
+ symbol <- as.character(sf[s,1])
+ vfsymbol<-tryCatch(getFinancials(as.character(symbol), src="google"),error=function(e){print(paste(symbol,'not found'));NA})
+ if(! is.na(vfsymbol)){
+  vfsymbol.f<-get(vfsymbol)
+ }else{
+  DF[1,s+1]<-NA
+  colnames(DF)[s+1] <- symbol
+  next}
+#view BALANCE Sheet
+ assign(paste("vfbsa",s,sep=""),viewFinancials(vfsymbol.f, type="BS", period="A"))
+ vfbsa<-get(paste("vfbsa",s,sep=""))
+
+#add date from vfbsa to first row of DF
+ DF[1,s+1]<- colnames(vfbsa)[1]
+ colnames(DF)[s+1] <- symbol
+
+  DF[2,s+1] <-vfbsa["Total Assets",1]
+  DF[3,s+1] <-vfbsa["Total Debt",1]
+  DF[4,s+1] <-vfbsa["Total Liabilities",1]
+
+  DF[19,s+1] <- vfbsa["Total Liabilities & Shareholders&#39; Equity",1]
+  DF[31,s+1] <- vfbsa["Total Liabilities & Shareholders&#39; Equity",2]
+  DF[32,s+1] <- vfbsa["Total Liabilities & Shareholders&#39; Equity",3]
+  if (dim(vfbsa)[2]>3){
+   DF[33,s+1] <- vfbsa["Total Liabilities & Shareholders&#39; Equity",4]
+  }
+
+  DF[5,s+1] <- as.numeric(vfbsa["Total Equity",1])
+  DF[23,s+1] <- as.numeric(vfbsa["Total Equity",2])
+  DF[22,s+1] <- as.numeric(vfbsa["Total Equity",3])
+  if (dim(vfbsa)[2]>3){
+   DF[21,s+1] <- as.numeric(vfbsa["Total Equity",4])
+  }
+  
+  DF[28,s+1] <- as.numeric(vfbsa["Total Common Shares Outstanding",1])
+ 
+  DF[40,s+1] <- as.numeric(vfbsa["Goodwill, Net",1])
+  DF[43,s+1] <- as.numeric(vfbsa["Goodwill, Net",2])
+  DF[45,s+1] <- as.numeric(vfbsa["Goodwill, Net",3])
+
+#overwrite above if Intangibles available (assuming Goowill always listed first)
+  if (!is.na(vfbsa["Intangibles, Net",1])){
+   DF[40,s+1] <- as.numeric(vfbsa["Intangibles, Net",1])
+   DF[43,s+1] <- as.numeric(vfbsa["Intangibles, Net",2]) 
+   DF[45,s+1] <- as.numeric(vfbsa["Intangibles, Net",3])
+  }
+ 
+
+#view INCOME Statement
+ assign(paste("vfisa",s,sep=""),viewFinancials(vfsymbol.f, type="IS", period="A"))
+ vfisa<-get(paste("vfisa",s,sep=""))
+
+  DF[7,s+1] <- as.numeric(vfisa["Income After Tax",1])
+  DF[8,s+1] <- as.numeric(vfisa["Net Income",1])
+  DF[9,s+1] <- as.numeric(vfisa["Income Before Tax",1])
+  DF[11,s+1] <- as.numeric(vfisa["Income Before Tax",2]) 
+
+  DF[6,s+1] <- as.numeric(vfisa["Total Revenue",1])
+  DF[10,s+1] <- as.numeric(vfisa["Total Revenue",2])
+  DF[27,s+1] <- as.numeric(vfisa["Total Revenue",3])
+  if (dim(vfisa)[2]>3){
+   DF[39,s+1] <- as.numeric(vfisa["Total Revenue",4])
+  }
+
+  DF[12,s+1] <- as.numeric(vfisa["Net Income",2])
+  DF[25,s+1] <- as.numeric(vfisa["Net Income",3])
+  if (dim(vfisa)[2]>3){
+   DF[30,s+1] <- as.numeric(vfisa["Net Income",4])
+  }
+
+
+
+#special cases and calculations
+#Surplus = Total Assets - Total Liabilities
+ DF[13,s+1] <- round(as.numeric(DF[2,s+1])-as.numeric(DF[4,s+1]),2)
+#Net Income Margin = Net Income*100/Total Revenue
+ DF[14,s+1] <- round(as.numeric(DF[8,s+1])*100/as.numeric(DF[6,s+1]),2)
+#Net Income Margin (Prior yr) = PreNetIncome*100/PreRevenue
+ DF[15,s+1]<- round(as.numeric(DF[12,s+1])*100/as.numeric(DF[10,s+1]),2)
+#1 Yr Revenue Growth Rate = (Revenue/Previous Yr Revenue)-1
+ DF[16,s+1]<- (round(as.numeric(DF[6,s+1])/as.numeric(DF[10,s+1])-1,2))
+#EBT Margin = EBT/Revenue
+ DF[17,s+1]<- round(as.numeric(DF[9,s+1])/as.numeric(DF[6,s+1]),2)
+#EBT Margin from Prior yr = PreEBT/PreRevenue
+ DF[18,s+1]<- round(as.numeric(DF[11,s+1])/as.numeric(DF[10,s+1]),2)
+#ROE = Net Income/Shareholder's equity
+ DF[20,s+1]<- round(as.numeric(DF[8,s+1])/as.numeric(DF[19,s+1]),4)
+#Historic Return on Equity = average of 3 rates
+ DF[24,s+1]<-round((as.numeric(DF[8,s+1])/as.numeric(DF[19,s+1])+
+                    as.numeric(DF[12,s+1])/as.numeric(DF[31,s+1])+
+                    as.numeric(DF[25,s+1])/as.numeric(DF[32,s+1]))
+                   /3,2)
+#2 Yr Earnings CAGR = ((Total Income/Total Income (2 yr prev))^(1/2))-1
+ if (as.numeric(DF[25,s+1])>0){
+  DF[26,s+1]<-round(((as.numeric(DF[8,s+1])/as.numeric(DF[25,s+1]))^.5)-1,2)
+ }
+#GRAPH
+ openxts<-getSymbols(symbol)
+ open<-as.data.frame(tail(get(openxts),1))[1,1]
+ color<-10+2*s
+ GraphOfOpeningValue<- get(openxts)[,1]
+ if (s ==1 ) {
+  plot(GraphOfOpeningValue, ylim=c(1,450))
+  legendsymbols<-symbol
+  }
+ lines(GraphOfOpeningValue,col=colors[s])
+ legendsymbols[s]<-symbol
+#MVE = Market shares outstanding*current stock value
+ DF[29,s+1] <- round(as.numeric(DF[28,s+1])*open,2)
+#2 Yr Avg EBT Margin = avg (EBT Margin & EBT Margin from prior yr)
+ DF[34,s+1] <- (as.numeric(DF[17,s+1])+as.numeric(DF[18,s+1]))/2
+#2 Yr Avg Net Income Margin = avg (Net Income Margin * Net Income Margin (prior yr))
+ DF[35,s+1] <- (as.numeric(DF[14,s+1])+as.numeric(DF[15,s+1]))/2
+#2 Yr Avg Return on Equity = average of 2 rates
+ DF[36,s+1]<-round((as.numeric(DF[8,s+1])/as.numeric(DF[19,s+1])+
+                    as.numeric(DF[12,s+1])/as.numeric(DF[31,s+1]))
+                    /2,4)
+#Net Income Margin (2 prior yr)
+ if (as.numeric(DF[27,s+1])>0  & !is.na(DF[27,s+1])){
+  DF[37,s+1]<-round(as.numeric(DF[25,s+1])*100/as.numeric(DF[27,s+1]),2)
+ }
+#Net Income Margin (3 prior yr)
+ if (!is.na(as.numeric(DF[39,s+1]))){
+  DF[38,s+1]<-round(as.numeric(DF[30,s+1])*100/as.numeric(DF[39,s+1]),2)
+ }
+#DF[40,] = Goodwill, Net 
+#Tangible Book Value of Equity = Equity - Goodwill
+ DF[41,s+1]<-round(as.numeric(DF[5,s+1])-as.numeric(DF[40,s+1]))
+#ROTE = Net Income / (Common Shareholder Equity – Intangibles)
+ DF[42,s+1]<- round(as.numeric(DF[8,s+1])/(as.numeric(DF[19,s+1])-as.numeric(DF[40,s+1])),4)
+#DF[43,] = Pre Goodwill
+#ROTE - 3 yr avg
+ DF[44,s+1]<- round((as.numeric(DF[8,s+1])/(as.numeric(DF[19,s+1])-as.numeric(DF[40,s+1]))+
+                    as.numeric(DF[12,s+1])/(as.numeric(DF[31,s+1])-as.numeric(DF[43,s+1]))+
+                    as.numeric(DF[25,s+1])/(as.numeric(DF[32,s+1])-as.numeric(DF[45,s+1])))/3,4)
+#DF[46,] "Growth of Equity- 3 yr historical (2010 to 2013)" 
+ DF[46,s+1]<-round((as.numeric(DF[5,s+1])-as.numeric(DF[21,s+1]))/as.numeric(DF[21,s+1]),2)
+
+}
+ op<-par(cex=.54)
+ legend("topright",legendsymbols, pch=19,col=colors,text.font=1,border="none")
+
+
+DF
+DP<- DF[c(3,5,6,8,12,9,13,14:15,35,16:18,34,20,36,26,29,41,42,44,45,46),]
+DP
+write.matrix(DP, "C:/Users/Public/Documents/today.xls", sep="\t")
+
