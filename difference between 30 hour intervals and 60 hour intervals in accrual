@@ -5,7 +5,6 @@ eeacc60 <- data.frame(ems[,1])
 pp30hr <- data.frame(ems[,1],0)
 pp60hr <- data.frame(ems[,1],0)
 for (i in 1:13){
- tser<- seq(2,100,2)
  for (t in 2:100){
   z<-rnorm(52,ems[i,2],ems[i,3])
   eeacc30[i,t]<- sum(abs(floor(z/30)))
@@ -13,9 +12,7 @@ for (i in 1:13){
   eeacc60[i,t]<- 2*sum(abs(floor(x/60)))
  }
 pp30hr[i,2]<-mean(as.numeric(eeacc30[i,2:100]))
-pp30hr
 pp60hr[i,2]<-mean(as.numeric(eeacc60[i,2:100]))
-pp60hr
 eeacc<-data.frame(ems[,1],pp30hr[,2],pp60hr[,2])
 }
 
