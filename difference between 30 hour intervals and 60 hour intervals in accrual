@@ -18,3 +18,8 @@ eeacc<-data.frame(ems[,1],pp30hr[,2],pp60hr[,2])
 
 eeacc
 sum(eeacc[,2])-sum(eeacc[,3])
+
+his<-abs(eeacc60[,2:1000]-eeacc30[,2:1000])
+hism<-melt(his)
+hist(hism[,2],main="Difference between 30/60 hr tracking",xlab="days difference",ylab="count of 1000 years for the 13 TEMP PSC employees")
+
