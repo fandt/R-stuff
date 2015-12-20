@@ -1,0 +1,28 @@
+library(httr)
+library(XML)
+library(rvest)
+library(MASS)
+
+#load page source, get dataframe of links
+page<-GET("http://www.coffeeratings.com/machine-listings.php?page=3")
+x<-content(page,"text")
+links<-xpathSApply(htmlParse(x),"//a/@href")
+DF <- data.frame()
+dfi = 1
+for (link in 1:(length(links))){
+ if (grepl("machine", links[link])){
+  fresh<- links[link]
+  full<- paste("www.coffeeratings.com",fresh,sep="")
+  DF[dfi,1]<-as.character(full)
+  dfi<-dfi+1
+}}
+
+dfi2<-1
+for (mach in 1:(dim(DF)[1])){
+ machpage<- GET(DF[mach,1])
+ machpga<-xmlParse(machpage, isHTML=TRUE)
+ machtbl<-readHTMLTable(machpga,stringsAsFactors=FALSE)
+ DF2[dfi2] <-machtbl[4]
+ dfi2<-dfi2+1
+ write.matrix(DF2,"C:/Users/Rebecca/Desktop/Overland/Phil/opera.xls", sep="/t")
+}
