@@ -3,4 +3,4 @@ stringsAsFactors=FALSE)
 job<-as.character(SalTeacher[,1])
 salary<-as.numeric(gsub(",","",SalTeacher[,2]))
 boxplot(salary~job, main="Salaries for HS", xlab="position",ylab="salary",ylim=c(25000,40000))
-class(SalTeacher[,2])
+
