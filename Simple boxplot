@@ -1,4 +1,6 @@
-SalTeacher<-read.table("C:/Users/rmorganstern/Downloads/Teacher salaries.txt",header=FALSE,sep="\t")
+SalTeacher<-read.table("C:/Users/rmorganstern/Downloads/Teacher salaries.txt",colClasses=types,header=FALSE,sep="\t",
+stringsAsFactors=FALSE)
 job<-as.character(SalTeacher[,1])
-salary<-as.numeric(SalTeacher[,2])
-boxplot(salary~job, main="Salaries for HS", xlab="position",ylab="salary")
+salary<-as.numeric(gsub(",","",SalTeacher[,2]))
+boxplot(salary~job, main="Salaries for HS", xlab="position",ylab="salary",ylim=c(25000,40000))
+class(SalTeacher[,2])
