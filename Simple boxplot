@@ -4,3 +4,10 @@ job<-as.character(SalTeacher[,1])
 salary<-as.numeric(gsub(",","",SalTeacher[,2]))
 boxplot(salary~job, main="Salaries for HS", xlab="position",ylab="salary",ylim=c(25000,40000))
 
+-or-
+
+SalTeacher<-read.table("C:/Users/rmorganstern/Downloads/Teacher ages.txt",header=FALSE,sep="\t",
+stringsAsFactors=FALSE)
+job<-as.character(SalTeacher[,1])
+ages<-as.numeric(gsub(",","",SalTeacher[,2]))
+boxplot(ages~job, main="Ages for HS", xlab="position",ylab="age",ylim=c(16,80))
