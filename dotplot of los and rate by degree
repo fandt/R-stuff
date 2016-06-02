@@ -1,0 +1,9 @@
+library(lattice)
+DegTeacher<-read.table("C:/Users/rmorganstern/Documents/reports/HS EHS/HS EHS with degrees.txt",header=TRUE,sep="\t",
+stringsAsFactors=FALSE)
+degree<-as.character(DegTeacher[,9])
+ratehr<-as.numeric(DegTeacher[,8])
+effective<-as.numeric(round(DegTeacher[,11]/30,0) )
+effect.f <-factor(effective)
+dotplot(effect.f~ratehr|degree, type=c("p","r"),main="Rate and effective date by degree", 
+ylab="months since effective date",xlab="Hrly Rate"  )
