@@ -1,0 +1,15 @@
+library (RODBC)
+library(MASS)
+
+con<-odbcConnect("localhost")
+query<-sqlQuery(con,"Select dt_when from bottlesareus.itemsales")
+
+odbcClose(con)
+for (i in query){
+  df<-data.frame(date=i)
+  df$wkday<-weekdays(as.Date(df$date))
+  df$day<-as.Date(df$date)
+}
+wkday.freq<-table(df$wkday)
+day.freq<-table(df$day)
+barplot(day.freq,col=c("green","red","red","blue","blue","blue","blue"))
