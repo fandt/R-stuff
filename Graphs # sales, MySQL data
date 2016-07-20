@@ -12,4 +12,4 @@ for (i in query){
 }
 wkday.freq<-table(df$wkday)
 day.freq<-table(df$day)
-barplot(day.freq,col=c("green","red","red","blue","blue","blue","blue"))
+barplot(day.freq,main="Count of sales. Green:Fri, Red:Weekends",col=c("green","red","red","blue","blue","blue","blue"))
