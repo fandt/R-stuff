@@ -1,0 +1,44 @@
+library (RODBC)
+library(MASS)
+
+con<-odbcConnect("localhost")
+
+query<-sqlQuery(con,"SELECT SUM(c_ticketitem_net_price) FROM itemsales 
+WHERE DAYOFWEEK(dt_when) = 1 
+GROUP BY DAY(dt_when)")
+
+for (i in query){
+  df<-data.frame(Sun=i[1:21])
+}
+
+for (counter in 2:7){
+ statement<-paste("SELECT SUM(c_ticketitem_net_price) FROM itemsales 
+ WHERE DAYOFWEEK(dt_when)=",counter,"  GROUP BY DAY(dt_when)",sep="")
+ query2<-sqlQuery(con,statement)
+ for (i in query2){
+  print(length(i))
+  if(length(i)>21){
+   ti<-i[2:22]
+   print(length(i))
+} 
+  else{
+   ti<-i
+   print("true")
+}
+    df[,counter]<-ti
+  }
+ }
+
+odbcClose(con)
+
+lowest<-min(df)
+highest<-max(df)
+
+plot(df[,1],ylim=c(lowest,highest),xlab = "weeks of the year",ylab="daily sales")
+colors<-c("gray","blue","pink","green","red","orange","yellow")
+for (color in 1:7){
+ lines(df[,color], col=colors[color])
+}
+legend("topright",c("Sun","Mon","Tue","Wed","Thr","Fri","Sat"),col=colors, pch=c(1,1))
+
+
