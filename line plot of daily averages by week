@@ -16,14 +16,11 @@ for (counter in 2:7){
  WHERE DAYOFWEEK(dt_when)=",counter,"  GROUP BY DAY(dt_when)",sep="")
  query2<-sqlQuery(con,statement)
  for (i in query2){
-  print(length(i))
   if(length(i)>21){
    ti<-i[2:22]
-   print(length(i))
 } 
   else{
    ti<-i
-   print("true")
 }
     df[,counter]<-ti
   }
