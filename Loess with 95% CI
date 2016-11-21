@@ -1,0 +1,17 @@
+library(forecast)
+
+dm<-read.table("H:/Accounts/Ardent Mills/Med and Rx Total.csv", sep=",",header=T)
+dm$moyr<-as.Date(dm$moyr,format='%m/%d/%Y')
+#scatter.smooth(x=1:length(dm$moyr),y=dm$net,xaxt="n",xlab="Date",ylab="Net",evaluation=27)
+
+x<-1:length(dm$moyr)
+lo2<-loess(dm$net~(1:x))
+lines(predict(lo2),col="red")
+
+plot(x=1:length(dm$moyr),y=dm$net,xaxt="n",xlab="Date",ylab="Net")
+plx<-predict(loess(dm$net~x),se=T)
+lines(x,plx$fit,col='blue')
+lines(x,plx$fit-qt(.975,plx$df)*plx$se,lty=2)
+lines(x,plx$fit+qt(.975,plx$df)*plx$se,lty=2)
+axis(1,x,format(dm$moyr,'%b %y'), cex.axis=.7)
+
