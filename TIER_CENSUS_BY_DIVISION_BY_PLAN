@@ -1,8 +1,9 @@
-
+library(MASS)
 
 dm<-read.table("H:/Accounts/Blackfoot Telephone/TIER_CENSUS_BY_DIVISION_BY_PLAN_0000605_102016.txt", sep="\t",header=F)
 head(dm)
-spit<-data.frame(Coverage=integer(),Division=integer(),Div_Desc=integer(),EE_Tier=integer())
+spit<-data.frame(Coverage=integer(),Division=integer(),Div_Desc=integer(),EE_Tier=integer(),Total_EEs=integer(),
+       Male_EEs=integer(),Fem_EEs=integer(),Male_Sp=integer(),Fem_Sp=integer(),Male_Dep=integer(),Fem_Dep=integer(),Total_Mbr=integer())
 
 for (line in 1:dim(dm)[1]){
  IsPlan<-grepl("Plan",dm[line,1])
@@ -19,7 +20,13 @@ for (line in 1:dim(dm)[1]){
   spit[crow,3]<-(Div_Desc)
   spit[crow,1]<-(Coverage)
   spit[crow,4]<-as.character(dm[line,1])
+  #
+  counts<-data.frame(strsplit(as.character(dm[line,2])," "))
+  colnames(counts)<-"count"
+  tcounts<-t(subset(counts,count!=""))
+  spit[crow,5:12]<-tcounts[]
 }
 }
 
 spit
+write.matrix(spit,"H:/Accounts/Blackfoot Telephone/rm.xls",sep="\t")
