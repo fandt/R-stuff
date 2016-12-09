@@ -1,4 +1,5 @@
 
+
 dm<-read.table("H:/Accounts/Blackfoot Telephone/TIER_CENSUS_BY_DIVISION_BY_PLAN_0000605_102016.txt", sep="\t",header=F)
 head(dm)
 spit<-data.frame(Coverage=integer(),Division=integer(),Div_Desc=integer(),EE_Tier=integer())
@@ -9,17 +10,15 @@ for (line in 1:dim(dm)[1]){
 #  print (dm[line,1])
   Division<-strsplit(as.character(dm[line,1])," ")[[1]][1]
   Div_Desc<-strsplit(strsplit(as.character(dm[line,1])," - ")[[1]][2],": ")
-  crow<- nrow(spit)+1
-  spit[crow,2]<-(Division)
-  spit[crow,3]<-(Div_Desc)
-  spit[crow,1]<-strsplit(as.character(dm[line+1,1])," ")[[1]][1]
-  spit[crow,4]<-as.character(dm[line+2,1])
+  Coverage<-strsplit(as.character(dm[line+1,1])," ")[[1]][1]
 } else if (grepl("Female",dm[line,1])) {
+  Coverage<-strsplit(as.character(dm[line,1])," ")[[1]][1]
+} else if (grepl("Total",dm[line,1])==FALSE & grepl("Female",dm[line,1])==FALSE & grepl("Subtotal",dm[line,1])==FALSE){
   crow<-nrow(spit)+1
   spit[crow,2]<-(Division)
   spit[crow,3]<-(Div_Desc)
-  spit[crow,1]<-strsplit(as.character(dm[line,1])," ")[[1]][1]
-  spit[crow,4]<-as.character(dm[line+1,1])
+  spit[crow,1]<-(Coverage)
+  spit[crow,4]<-as.character(dm[line,1])
 }
 }
 
