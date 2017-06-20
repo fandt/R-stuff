@@ -1,0 +1,9 @@
+library(MASS)
+
+dm<-read.table("H:/Accounts//Active Claims.txt", sep="\t",header=F,colClasses=c("character","numeric"))
+head(dm)
+dm$date<-format(paste("1-",dm$V1,sep=""),format= "%b-%y")
+dm$date<-as.Date(dm$date,"%d-%b-%y")
+class(dm$date
+plot(dm$date,dm$V2)
+lines(dm$date,dm$V2)
