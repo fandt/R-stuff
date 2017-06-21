@@ -1,9 +1,29 @@
 library(MASS)
+library(forecast)
 
-dm<-read.table("H:/Accounts//Active Claims.txt", sep="\t",header=F,colClasses=c("character","numeric"))
+dm<-read.table("H:/Accounts/Blackfoot Telephone/Active Claims.txt", sep="\t",header=F,colClasses=c("character","numeric"))
 head(dm)
 dm$date<-format(paste("1-",dm$V1,sep=""),format= "%b-%y")
 dm$date<-as.Date(dm$date,"%d-%b-%y")
-class(dm$date
+class(dm$V2)
+par(mfrow=c(2,1))
 plot(dm$date,dm$V2)
 lines(dm$date,dm$V2)
+abline(lsfit(dm$date,dm$V2))
+dm$month<-factor(format(dm$date,"%b"))
+dm$qrt[(dm$month %in% c("Jan","Feb","Mar"))]<-"Q1"
+dm$qrt[(dm$month %in% c("Apr","May","Jun"))]<-"Q2"
+dm$qrt[(dm$month %in% c("Jul","Aug","Sep"))]<-"Q3"
+dm$qrt[(dm$month %in% c("Oct","Nov","Dec"))]<-"Q4"
+Q1pt<-dm[which (dm$qrt=="Q1"),]
+points(Q1pt$date,Q1pt$V2,col='blue')
+Q2pt<-dm[which (dm$qrt=="Q2"),]
+points(Q2pt$date,Q2pt$V2,col='green')
+Q3pt<-dm[which (dm$qrt=="Q3"),]
+points(Q3pt$date,Q3pt$V2,col='pink')
+Q4pt<-dm[which (dm$qrt=="Q4"),]
+points(Q4pt$date,Q4pt$V2,col='grey')
+
+boxplot(dm$V2~dm$qrt,data=dm,main="Claims by Quarter",xlab="Qrt",ylab="Claims",col=c("blue","green","pink","grey"))
+text(x=boxplot.stats(dm$V2~dm$qrt)$stats,labels=boxplot.stats(dm$V2~dm$qrt)$stats,pos=3)
+
