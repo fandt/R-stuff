@@ -1,7 +1,7 @@
 library(MASS)
 library(forecast)
 
-dm<-read.table("H:/Accounts/Blackfoot Telephone/Active Claims.txt", sep="\t",header=F,colClasses=c("character","numeric"))
+dm<-read.table("H:/Accounts//Active Claims.txt", sep="\t",header=F,colClasses=c("character","numeric"))
 head(dm)
 dm$date<-format(paste("1-",dm$V1,sep=""),format= "%b-%y")
 dm$date<-as.Date(dm$date,"%d-%b-%y")
