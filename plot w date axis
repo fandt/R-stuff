@@ -24,6 +24,7 @@ points(Q3pt$date,Q3pt$V2,col='pink')
 Q4pt<-dm[which (dm$qrt=="Q4"),]
 points(Q4pt$date,Q4pt$V2,col='grey')
 
+qstat<-paste("$",formatC(as.numeric(c(mean(Q1pt$V2),mean(Q2pt$V2),mean(Q3pt$V2),mean(Q4pt$V2))),format="f",digits=0,big.mark=","))
 boxplot(dm$V2~dm$qrt,data=dm,main="Claims by Quarter",xlab="Qrt",ylab="Claims",col=c("blue","green","pink","grey"))
-text(x=boxplot.stats(dm$V2~dm$qrt)$stats,labels=boxplot.stats(dm$V2~dm$qrt)$stats,pos=3)
+text(c(1:4),qstat,labels=qstat,pos=3)
 
