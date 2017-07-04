@@ -1,0 +1,20 @@
+library(RODBC)
+library(MASS)
+
+dbhandle <- odbcDriverConnect('driver={MySQL ODBC 5.1 Driver};
+	server=localhost;database=bottlesareus;uid=root')
+
+sales<-read.table("C:/Users/Rebecca/Desktop/Overland/Item Sales Alphabetical ytd 7.10.16.csv",header=TRUE,sep=",")
+sales[2,]
+for (i in 1:dim(sales)[1]){
+
+pasties<-paste("'",sales$s_item[i],"','",sales$c_ticketitem_net_price[i],"','",
+sales$f_ticketitem_real_qty[i],"','",sales$s_revenue_class[i],"','",
+sales$s_item_group[i],"','",
+sales$dt_when[i],"','",sales$i_ticket_item_id[i],"','",sales$s_name[i],"'",sep="")
+
+pastequery<-paste("insert into itemsales (`s_item`,`c_ticketitem_net_price`,`f_ticketitem_real_qty`,`s_revenue_class`,`s_item_group`,`dt_when`,`i_ticket_item_id`,`s_name`)values (",pasties,");")
+
+query<-sqlQuery(dbhandle ,pastequery)
+
+}
