@@ -10,17 +10,21 @@ where   month(dt_when)=1 and dayofweek(dt_when)=1"
 queryA<-sqlQuery(con,statementA)
 testcor<- queryA[which(queryA$s_name=="Rebecca"),]
 colnames(testcor)<-c("s_name","hour","date")
-tcdf<-data.frame()
+tcdf<-data.frame(daycountA=integer(),daycount2=integer())
 for (i in 0:23){
- hoursperday<-length(testcor[which(queryA$hour==i),i])
- print (hoursperday) 
- tcdf[i,1]<-data.frame(hoursperday)
+ hoursperday<-length(testcor[which(testcor$hour==i),2])
+ tcdf[i+1,1]<-hoursperday
 }
 for (level in levels(queryA$s_name)){
 #build second df with each other person's hours 
  print (level)
  colnames(testcor2)<-c("s_name","hour","date")
  testcor2<-queryA[which(queryA$s_name==level),]
- cor(testcor$hour ,testcor2$hour )
- print (paste( cor(testcor,testcor2)),level)
+  for (i in 0:23){
+   hoursperday<-length(testcor2[which(testcor2$hour==i),2])
+   tcdf[i+1,2]<-hoursperday
+  }
+  print (testcor2$s_name)
+  print(cor(tcdf))
+  
 }
