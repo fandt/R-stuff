@@ -17,6 +17,7 @@ for (i in 0:23){
 }
 for (level in levels(queryA$s_name)){
 #build second df with each other person's hours 
+ rankedcor<-append(rankedcor,level)
  print (level)
  colnames(testcor2)<-c("s_name","hour","date")
  testcor2<-queryA[which(queryA$s_name==level),]
@@ -24,7 +25,7 @@ for (level in levels(queryA$s_name)){
    hoursperday<-length(testcor2[which(testcor2$hour==i),2])
    tcdf[i+1,2]<-hoursperday
   }
-  print (testcor2$s_name)
-  print(cor(tcdf))
-  
+  dist<-sqrt(sum(tcdf$daycountA,tcdf$daycount2)^2 )
+  rankedcor<-append(rankedcor,dist)  
+  print(sqrt(sum(tcdf$daycountA,tcdf$daycount2)^2 ))  
 }
