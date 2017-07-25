@@ -4,14 +4,18 @@ library(MASS)
 con<- odbcDriverConnect('driver={MySQL ODBC 5.1 Driver};
 	server=localhost;database=bottlesareus;uid=root')
 
-statementA<-"SELECT DISTINCT  s_name, hour(dt_when),date(dt_when) from itemsales
-where   month(dt_when)=1 and dayofweek(dt_when)=1"
+minis<-data.frame()
+color=rainbow(7)
+for (dayofweek in 1:7){
+ statementA<-paste("SELECT DISTINCT  s_name, hour(dt_when),date(dt_when) from itemsales
+ where   month(dt_when)=1 and dayofweek(dt_when)=",dayofweek,sep="")
 
 queryA<-sqlQuery(con,statementA)
+#testcor=subset of query that belongs to person being tested
 testcor<- queryA[which(queryA$s_name=="Rebecca"),]
-colnames(testcor)<-c("s_name","hour","date")
+#tcdf=testcordataframe=24 hour array with counts of that hour worked
 tcdf<-data.frame(daycountA=integer(),daycount2=integer())
-
+#gets test case counts for hours worked, ends.
 for (i in 0:23){
  hoursperday<-length(testcor[which(testcor$hour==i),2])
  tcdf[i+1,1]<-hoursperday
@@ -19,15 +23,46 @@ for (i in 0:23){
 
 rankedcor<-data.frame(name=character(),distance=integer())
 for (level in levels(queryA$s_name)){
+ if (level!="Rebecca"){
 #build second df with each other person's hours 
- print (level)
- colnames(testcor2)<-c("s_name","hour","date")
- testcor2<-queryA[which(queryA$s_name==level),]
-  for (i in 0:23){
-   hoursperday<-length(testcor2[which(testcor2$hour==i),2])
-   tcdf[i+1,2]<-hoursperday
-  }
-  dist<-sqrt(sum(tcdf$daycountA,tcdf$daycount2)^2 )
-  rankedcor <- rbind(rankedcor, data.frame(name=level, distance=dist))
-}
+  testcor2<-queryA[which(queryA$s_name==level),]
+   for (i in 0:23){
+    hoursperday<-length(testcor2[which(testcor2$hour==i),2])
+    tcdf[i+1,2]<-hoursperday
+   }
+#get Euclidean distance
+   dist<-sqrt(sum(tcdf$daycountA-tcdf$daycount2)^2 )
+   rankedcor <- rbind(rankedcor, data.frame(name=level, distance=dist))
+}}
 sortrank<-rankedcor[order(rankedcor$distance),]
+
+#Starting the plotting
+lowest<-as.character(sortrank[1,1])
+##
+print (paste(lowest,color[dayofweek],sortrank$distance[1],sep=" "))
+statementB<-paste("SELECT date(dt_when),hour(dt_when),STDDEV(c_ticketitem_net_price) from itemsales
+where   month(dt_when)=1 and dayofweek(dt_when)=",dayofweek," and s_name='",lowest,"' group by date(dt_when),hour(dt_when)",sep="")
+
+queryB<-sqlQuery(con,statementB)
+tagged<-cbind(queryB,lowest,color[dayofweek])
+minis<-rbind(minis,tagged)
+}
+colnames(minis)<-c("date","netprice","lowest","shade")
+
+target<-"Rebecca"
+
+statementC<-paste("SELECT date(dt_when),hour(dt_when),STDDEV(c_ticketitem_net_price),s_name from itemsales
+where   month(dt_when)=1 and s_name='",target,"' group by date(dt_when),hour(dt_when)",sep="")
+
+queryC<-sqlQuery(con,statementC)
+colnames(queryC)<-c("date","hour","netprice","featured")
+#convert date and hour into datetime
+queryC<-cbind(queryC,format(paste(queryC$date,queryC$hour),format="%Y-%m-%d %H"))
+plot(minis$date,minis$netprice,col=minis$shade)
+lines(queryC$date,queryC$netprice)
+
+
+
+
+odbcClose(con)
+
