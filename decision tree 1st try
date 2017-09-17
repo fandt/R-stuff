@@ -1,0 +1,51 @@
+library(RODBC)
+library(MASS)
+
+con<- odbcDriverConnect('driver={MySQL ODBC 5.1 Driver};
+	server=localhost;database=bottlesareus;uid=root')
+
+
+# January (1.2016)
+statementA<-"SELECT DATE_FORMAT(dt_when, '%Y-%m-%d') DATEONLY,  
+       DATE_FORMAT(dt_when,'%H') TIMEONLY, 
+ 	 count(dt_when),DATE_FORMAT(dt_when, '%d,%H') as dayhour, s_name,sum(`c_ticketitem_net_price`),
+       dayofweek(dt_when),s_revenue_class
+	 FROM `itemsales` 
+	 WHERE month(dt_when)=1  
+     group by (dayhour);"
+queryA<-sqlQuery(con,statementA)
+TF <- queryA[,5]=="Rebecca"
+bin<-cbind(queryA,TF)
+#TEST THAT COUNT(dt_when) AND ASK
+bin[,8]<-as.factor(bin.train[,8])
+
+
+fdata<-bin[sample(nrow(bin)),]
+bin.train<-fdata[1:(nrow(bin)/2),]
+bin.test<-fdata[(round(nrow(bin)/2)+1):nrow(bin),]
+
+odbcClose(con )
+
+#regressive partition
+library(rpart)
+fit<-rpart(bin.train$TF~bin.train[,2],bin.train[,3],bin.train[,6], method='class',control = rpart.control(minsplit=3, minbucket=1, cp=0.001),data=bin)
+
+printcp(fit) # display the results 
+plotcp(fit) # visualize cross-validation results 
+summary(fit) # detailed summary of splits
+
+plot(fit, uniform=TRUE, 
+  	main="Classification Tree for Identifying hour worked by her or not")
+text(fit, use.n=TRUE, all=TRUE, cex=.8)
+
+
+
+
+
+#statementA<-"SELECT DATE_FORMAT(dt_when, '%Y-%m-%d') DATEONLY, 
+#       DATE_FORMAT(dt_when,'%H:%i:%s') TIMEONLY, 
+# 	 dt_when, s_name,`c_ticketitem_net_price` 
+#	 FROM `itemsales` 
+#	 WHERE month(dt_when)=1 and day(dt_when)=2 and s_name!='Rebecca'
+#       order by dt_when;"
+#queryA<-sqlQuery(con,statementA)
