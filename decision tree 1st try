@@ -1,6 +1,8 @@
 library(RODBC)
 library(MASS)
 
+I DID SOMETHING
+
 con<- odbcDriverConnect('driver={MySQL ODBC 5.1 Driver};
 	server=localhost;database=bottlesareus;uid=root')
 
