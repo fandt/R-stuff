@@ -1,54 +1,59 @@
 library(RODBC)
 library(MASS)
 
-I DID SOMETHING
-
 con<- odbcDriverConnect('driver={MySQL ODBC 5.1 Driver};
 	server=localhost;database=bottlesareus;uid=root')
 
 
 # January (1.2016)
-statementA<-"SELECT DATE_FORMAT(dt_when, '%Y-%m-%d') DATEONLY,  
-       DATE_FORMAT(dt_when,'%H') TIMEONLY, 
- 	 count(dt_when),DATE_FORMAT(dt_when, '%d,%H') as dayhour, s_name,sum(`c_ticketitem_net_price`),
-       dayofweek(dt_when),s_revenue_class
+statementA<-"SELECT  *, DATE_FORMAT(dt_when, '%Y-%m-%d') DATEONLY,  
+       DATE_FORMAT(dt_when,'%H') TIMEONLY
 	 FROM `itemsales` 
-	 WHERE month(dt_when)=1  
-     group by (dayhour),s_name;"
+	 WHERE month(dt_when)=1  ;"
 queryA<-sqlQuery(con,statementA)
-TF <- queryA[,5]=="Rebecca"
-bin<-cbind(queryA,TF)
+head(queryA[,c(1:7,9:10)])
+TF <- queryA[,8]=="Rebecca"
+bin<-cbind(queryA[,c(1:5,9:10)],TF)
 #TEST THAT COUNT(dt_when) AND ASK
-
+head(queryA)
+#bin<-queryA[,c(1:5,9:10)]
+head(bin)
 
 fdata<-bin[sample(nrow(bin)),]
-bin.train<-fdata[1:(nrow(bin)/2),]
-bin.test<-fdata[(round(nrow(bin)/2)+1):nrow(bin),]
+bin.train<-fdata[1:round(4*(nrow(bin)/5)),]
+bin.test<-fdata[(round(4*nrow(bin)/5)+1):nrow(bin),]
 
 odbcClose(con )
 
 #regressive partition
 library(rpart)
-fit<-rpart(bin.train$TF~bin.train[,2]+bin.train[,3]+bin.train[,6],data=bin.train,method='class')
+library(rpart.plot)
+
+head(bin.train)
+fit<-rpart(bin.train$TF~.,data=bin.train,method='class')
  
 printcp(fit) # display the results 
 plotcp(fit) # visualize cross-validation results 
 summary(fit) # detailed summary of splits
 
-plot(fit, uniform=TRUE, 
+plot(fit.pruned, uniform=TRUE, 
   	main="Classification Tree for Identifying hour worked by her or not")
-text(fit, use.n=TRUE, all=TRUE, cex=.8)
+text(fit, use.n=TRUE, all=TRUE)
 
 #pruning not used, just leaving it in there for now
 bestcp <- fit$cptable[which.min(fit$cptable[,"xerror"]),"CP"]
 fit.pruned<-prune(fit,cp=bestcp)
-conf.matrix <- table(bin.train$TF, predict(fit,type="vector")>=.5)
+
+conf.matrix <- table(bin.train$TF, predict(fit,type="class"))
+#wtf<-bin.train$TF
+#wtf$class<-predict(fit,bin.test,type="class")
+#wtf$o<-predict(fit,bin.test,type="prob")
+#head(wtf)
+#wtf.matrix<- table(bin$TF,predict(fit,bin.test,type="class"))
 
 rownames(conf.matrix) <- paste("Actual", rownames(conf.matrix), sep = ":")
 colnames(conf.matrix) <- paste("Pred", colnames(conf.matrix), sep = ":")
 print(conf.matrix)
-
-
 
 
 
