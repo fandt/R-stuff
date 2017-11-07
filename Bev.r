@@ -10,7 +10,7 @@ PLwP<-unique(PL)
 for (boo in 1:dim(PLwP)[1]){
  PLwP[boo,1]<-  gsub("\\s+"," ",as.character(PLwP[boo,1]))
  price<-Prices[grep(PLwP[boo,1],Prices$Name),2] 
-#this mess looks more more than one price
+#this mess looks for more than one price
  if (length(price)>1){
   for (dee in 2:length(price)){
    if (price[1]!= price[dee]){
