@@ -14,11 +14,12 @@ for (boo in 1:dim(PLwP)[1]){
  if (length(price)>1){
   for (dee in 2:length(price)){
    if (price[1]!= price[dee]){
-    print (paste("This product has more than one price:",PLwP[boo,1]))
     price<-paste("This product has more than one price:",PLwP[boo,1])
     break
  }else (price<-price[1])
 }}
  PLwP[boo,2]<-  as.character(price)
 }
-PLwP
+ProductListWithPrice<-PLwP[!duplicated(PLwP$Name),]
+write.matrix(ProductListWithPrice,"C:/Users/Rebecca/Desktop/Bevager/rm.xls",sep="\t")
+
