@@ -1,0 +1,6 @@
+data<-matrix(sample(1000:3000,9),nrow=3)
+colnames(data)<-c("1/1/16","2/1/16","3/1/16")
+rownames(data)<-c("f", "l","b")
+dates<-as.Date(date,"%m/%d")
+
+barplot(data,beside=T,legend=rownames(data))
