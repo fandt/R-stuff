@@ -21,6 +21,15 @@ o <- c(15, 1.02,68799231, .86, 76395194)
 p <- c(16, 1.10,289158768, 1.04, 193304000)
 oDF <- data.frame(a, b, c, d, e, f, g,
                     h, i, j, k, l, m, n, o, p )
+#a<- c(1,2,3)
+#b<-c(4,5,6)
+#fuckme<-data.frame(a,b)
+#fuckme
+#  a b
+#1 1 4
+#2 2 5
+#3 3 6
+
 radius2011 <- sqrt( oDF[3,]/pi)
 radius2002 <- sqrt( oDF[5,]/pi)
 EoR2011 <- (oDF[2,])
