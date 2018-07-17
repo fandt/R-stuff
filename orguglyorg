@@ -1,0 +1,35 @@
+#let's see. I've gained 5 lbs since I started my new job, and instead of going running immediately I'm doing this. Kinda crazy to think that's a draw for me these days.
+
+library(RODBC)
+library(MASS)
+library(ggplot2)
+library(plotly)
+
+
+con<- odbcDriverConnect('driver={MySQL ODBC 5.1 Driver};
+	server=localhost;database=hierarchy;uid=root')
+
+# rjm (7.2018)
+statementA<-"SELECT  ee1.DisplayName, ee1.employeeid, ee2.DisplayName, ee2.EmployeeId 
+	 FROM Employee as EE1
+     left join manageremployee as mee
+     on ee1.employeeId=mee.employeeid
+	 left join Employee as EE2 
+	 on mee.managerId=ee2.employeeId;"
+queryA<-sqlQuery(con,statementA)
+head(queryA)
+odbcClose(con )
+xaxis<- c(7,4,2,2)
+yaxis<- c(5,5,6,4)
+body<-c(4,2,1,1)
+shape<-c(
+
+p<- plot_ly(
+
+
+
+
+
+
+
+
