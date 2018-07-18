@@ -19,6 +19,8 @@ statementA<-"SELECT  ee1.DisplayName, ee1.employeeid, ee2.DisplayName, ee2.Emplo
 queryA<-sqlQuery(con,statementA)
 head(queryA)
 odbcClose(con )
+
+The following should involve all THE MATHs!!! YES! 
 xaxis<- c(7,4,2,2)
 yaxis<- c(5,5,6,4)
 CEO<- 80
