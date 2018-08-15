@@ -19,21 +19,7 @@ queryA<-sqlQuery(con,statementA)
 head(queryA)
 odbcClose(con )
 
-The following should involve all THE MATHs!!! YES! 
-xaxis<- c(7,4,2,2)
-yaxis<- c(5,5,6,4)
-CEO<- 80
-boss<-40
-emp<- 20
-body<-c(CEO, boss,boss, emp)
-disting<-c('CEO', 'boss','boss', 'emp')
-shape<-c('circle','circle','circle','circle')
 
-#this should reflect where some additional  math is usually going to happen
-p<- plot_ly(data=queryA, x=~xaxis, y=~yaxis, type='scatter',mode='markers',symbol=~disting,
-    symbols=~shape,size=~body, color=~body,   showlegend = F)
-
-p
 
 
 
