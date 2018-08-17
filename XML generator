@@ -1,0 +1,52 @@
+library(XML)
+
+import.xml<-"
+<ActualKPIAxisMinuteImport AggregateToDay='true'>
+  <ActualKPIAxisMinute>
+          <XrefCode> xxx </XrefCode>
+          <DayId> xxx </DayId>
+          <MinuteId> xxx </MinuteId>
+          <AxisId> xxx </AxisId>
+          <TicXrefCode> xxx </TicXrefCode>
+          <KpiId> xxx </KpiId>
+          <Value> xxx </Value>
+  </ActualKPIAxisMinute>
+</ActualKPIAxisMinuteImport>"
+
+df<-read.table("C:/path.txt",sep="|",header=TRUE, colClasses=c("character","character","integer","integer"))
+df$Date<-as.Date(as.character(df$Date), "%Y%m%d")
+df$Hour<-format(strptime(df$Hour, "%H%M%S"),"%H:%M:%S")
+df$MinID<-paste(df$Date,df$Hour,sep="T")
+head(df)
+
+
+xml<-xmlTree()
+
+xml$addTag("ActualKPIAxisMinuteImport",close=FALSE, attrs=c(AggregateToDay='true'))
+#xml$addTag("ActualKPIAxisMinute",close=FALSE)
+
+ for (j in 1:5){  
+  xml$addTag("ActualKPIAxisMinute",close=FALSE)
+  xml$addTag("XrefCode",df$StoreNum[j])
+  xml$addTag("DayId",df$Date[j])
+  xml$addTag("MinuteId",df$MinID[j])
+  xml$addTag("AxisId","8")
+  xml$addTag("TicXrefCode","0")
+  xml$addTag("KpiId","29")
+  xml$addTag("Value",df$Traffic[j])
+  xml$closeTag()
+}
+
+cat(saveXML(xml))
+saveXML(xml,file="import.xml", indent=T,prefix='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>')
+
+
+
+
+
+
+
+
+
+
+
