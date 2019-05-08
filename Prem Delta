@@ -1,0 +1,20 @@
+carlo <- read.csv("C:/Users/Rebecca Morganstern/Documents/Client/PetVet/Filter 390/Change in PR/Stuff sent to Carlo/TEST.csv", header =TRUE, sep=",")
+
+class(carlo)
+head(carlo)
+dim(carlo)
+subprem<- c(carlo[which (carlo$Category=='Premium'),1]
+subdiff<-carlo[which (carlo$Category=='Premium'),18]
+cor(subprem,subdiff)
+
+hist(carlo[which (carlo$change>0),18]) # histogram of >0
+max(carlo$change)
+
+plot(subprem, subdiff)
+plot(subprem, subdiff, xlim=c(20,80), ylim=c(0,40)) 
+
+premdiff<-data.frame(subprem, subdiff)
+head(premdiff)
+prempos<-premdiff[which (premdiff$subprem>0),]
+head(prempos)
+cor(prempos$subprem, prempos$subdiff)  # .813
